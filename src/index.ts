@@ -41,6 +41,7 @@ bot.onText(/\/start/, (msg) => {
   "Welcome to CryptoMonitor Bot!🚀\n\n" +
    "Use the buttons below or type /help to see all available commands.\n\n" +
    "📊 Get Prices - View current prices and portfolio value\n" +
+   "📈 Pi Cycle - Check Bitcoin Pi Cycle Top indicator\n" +
    "❓ Help - Show all commands",
   mainKeyboard
  );
