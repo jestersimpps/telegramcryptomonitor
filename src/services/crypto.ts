@@ -60,8 +60,7 @@ class CryptoService {
 
           const data = await this.makeRequest<MarketChartData>(`${this.baseUrl}/coins/${ticker}/market_chart`, {
             vs_currency: 'usd',
-            from: Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000),
-            to: Math.floor(Date.now() / 1000),
+            days: 1,
             interval: 'hourly'
           });
           
