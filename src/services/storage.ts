@@ -40,19 +40,17 @@ class StorageService {
     return this.users.get(chatId);
   }
 
-  public addTicker(chatId: number, ticker: string): void {
-    const userData = this.users.get(chatId) || { chatId, tickers: [] };
-    if (!userData.tickers.includes(ticker.toLowerCase())) {
-      userData.tickers.push(ticker.toLowerCase());
-      this.users.set(chatId, userData);
-      this.saveData();
-    }
+  public addTicker(chatId: number, ticker: string, amount: number): void {
+    const userData = this.users.get(chatId) || { chatId, tickers: new Map() };
+    userData.tickers.set(ticker.toLowerCase(), amount);
+    this.users.set(chatId, userData);
+    this.saveData();
   }
 
   public removeTicker(chatId: number, ticker: string): void {
     const userData = this.users.get(chatId);
     if (userData) {
-      userData.tickers = userData.tickers.filter(t => t !== ticker.toLowerCase());
+      userData.tickers.delete(ticker.toLowerCase());
       this.users.set(chatId, userData);
       this.saveData();
     }

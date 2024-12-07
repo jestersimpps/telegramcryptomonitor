@@ -1,6 +1,6 @@
 export interface UserData {
   chatId: number;
-  tickers: string[];
+  tickers: Map<string, number>; // ticker -> amount mapping
 }
 
 export interface CryptoPrice {
