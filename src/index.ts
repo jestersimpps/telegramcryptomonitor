@@ -16,7 +16,7 @@ const bot = new TelegramBot(token, { polling: true });
 // Command handlers
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, 'Welcome to CryptoMonitor Bot!\n\nCommands:\n/add <ticker> <amount> - Add a crypto ticker with amount to monitor\n/remove <ticker> - Remove a crypto ticker\n/list - List your monitored tickers and amounts\n/prices - Get current prices and portfolio value');
+  bot.sendMessage(chatId, 'Welcome to CryptoMonitor Bot!\n\nCommands:\n/add <amount> <ticker> - Add an amount of crypto to monitor\n/remove <ticker> - Remove a crypto ticker\n/list - List your monitored tickers and amounts\n/prices - Get current prices and portfolio value');
 });
 
 bot.onText(/\/add (.+)/, (msg, match) => {
@@ -24,10 +24,10 @@ bot.onText(/\/add (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
   const parts = match[1].trim().split(' ');
   if (parts.length !== 2) {
-    bot.sendMessage(chatId, 'Usage: /add <ticker> <amount>\nExample: /add btc 0.5');
+    bot.sendMessage(chatId, 'Usage: /add <amount> <ticker>\nExample: /add 0.5 btc');
     return;
   }
-  const [ticker, amountStr] = parts;
+  const [amountStr, ticker] = parts;
   const amount = parseFloat(amountStr);
   if (isNaN(amount) || amount <= 0) {
     bot.sendMessage(chatId, 'Please provide a valid positive number for amount');
