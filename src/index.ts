@@ -55,8 +55,7 @@ bot.onText(/\/help/, (msg) => {
    "Crypto Commands:\n" +
    "/add <amount> <ticker> - Add crypto to portfolio\n" +
    "/remove <ticker> - Remove crypto from portfolio\n" +
-   "/list - List all your crypto holdings\n" +
-   "/prices - Get current prices\n\n" +
+   "/list - List all your crypto holdings\n\n" +
    "Update Timer:\n" +
    "/settime HH:mm - Set daily update time (24h format)\n" +
    "/removetime - Remove daily update timer\n\n" +
@@ -76,7 +75,7 @@ bot.on("message", (msg) => {
     bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
     return;
    }
-   sendPriceUpdate(chatId, userData.tickers);
+   sendTokenList(chatId, userData.tickers);
    break;
   }
   case "❓ Help": {
@@ -87,8 +86,7 @@ bot.on("message", (msg) => {
      "Crypto Commands:\n" +
      "/add <amount> <ticker> - Add crypto to portfolio\n" +
      "/remove <ticker> - Remove crypto from portfolio\n" +
-     "/list - List all your crypto holdings\n" +
-     "/prices - Get current prices\n\n" +
+     "/list - List all your crypto holdings\n\n" +
      "Update Timer:\n" +
      "/settime HH:mm - Set daily update time (24h format)\n" +
      "/removetime - Remove daily update timer"
@@ -140,16 +138,6 @@ bot.onText(/\/list/, async (msg) => {
  await sendTokenList(chatId, userData.tickers);
 });
 
-bot.onText(/\/prices/, async (msg) => {
- const chatId = msg.chat.id;
- const userData = storageService.getUser(chatId);
- if (!userData || userData.tickers.size === 0) {
-  bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
-  return;
- }
-
- await sendPriceUpdate(chatId, userData.tickers);
-});
 
 
 // Function to send token list with prices
@@ -240,7 +228,7 @@ schedule.scheduleJob('* * * * *', async () => {
 
  for (const user of users) {
   if (user.updateTime === currentTime && user.tickers.size > 0) {
-   await sendPriceUpdate(user.chatId, user.tickers);
+   await sendTokenList(user.chatId, user.tickers);
   }
  }
 });
