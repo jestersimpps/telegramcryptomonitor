@@ -19,8 +19,7 @@ const bot = new TelegramBot(token, { polling: true });
 const mainKeyboard = {
   reply_markup: {
     keyboard: [
-      [{ text: '📊 Get Prices' }, { text: '📋 List Tokens' }],
-      [{ text: '➕ Add Token' }, { text: '➖ Remove Token' }]
+      [{ text: '📊 Get Prices' }, { text: '📋 List Tokens' }]
     ],
     resize_keyboard: true
   }
@@ -32,9 +31,10 @@ bot.onText(/\/start/, (msg) => {
     chatId, 
     'Welcome to CryptoMonitor Bot! 🚀\n\nUse the buttons below to manage your crypto portfolio:\n\n' +
     '📊 Get Prices - View current prices and portfolio value\n' +
-    '📋 List Tokens - See your monitored tokens\n' +
-    '➕ Add Token - Add new token (use /add <amount> <ticker>)\n' +
-    '➖ Remove Token - Remove existing token',
+    '📋 List Tokens - See your monitored tokens\n\n' +
+    'Commands:\n' +
+    '/add <amount> <ticker> - Add new token\n' +
+    '/remove <ticker> - Remove token',
     mainKeyboard
   );
 });
@@ -65,12 +65,6 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId, `Your monitored tickers:\n${tickerList}`);
       break;
     }
-    case '➕ Add Token':
-      bot.sendMessage(chatId, 'To add a token, use the command:\n/add <amount> <ticker>\nExample: /add 0.5 btc');
-      break;
-    case '➖ Remove Token':
-      bot.sendMessage(chatId, 'To remove a token, use the command:\n/remove <ticker>\nExample: /remove btc');
-      break;
   }
 });
 
