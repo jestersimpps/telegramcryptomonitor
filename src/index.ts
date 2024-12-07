@@ -71,7 +71,7 @@ bot.on("message", (msg) => {
 
  switch (msg.text) {
   case "📈 Pi Cycle": {
-   bot.emit("message", { text: "/picycle", chat: { id: chatId } });
+   bot.emit("text", msg, ["/picycle"]);
    break;
   }
   case "📊 Get Prices": {
