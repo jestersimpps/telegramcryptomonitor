@@ -522,7 +522,7 @@ setInterval(async () => {
       const users = storageService.getAllUsers();
       
       users.forEach(user => {
-        const userAlerts = alerts.filter(alert => 
+        const userAlerts = alerts.filter((alert: AnomalyAlert) => 
           user.tickers.has(alert.coin.toLowerCase())
         );
         
