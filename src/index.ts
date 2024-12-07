@@ -3,6 +3,7 @@ import schedule from 'node-schedule';
 import dotenv from 'dotenv';
 import { storageService } from './services/storage';
 import { cryptoService } from './services/crypto';
+import { KeyboardButton } from 'node-telegram-bot-api';
 
 dotenv.config();
 
@@ -14,9 +15,48 @@ if (!token) {
 const bot = new TelegramBot(token, { polling: true });
 
 // Command handlers
+// Keyboard setup
+const mainKeyboard = {
+  reply_markup: {
+    keyboard: [
+      [{ text: '📊 Get Prices' }, { text: '📋 List Tokens' }],
+      [{ text: '➕ Add Token' }, { text: '➖ Remove Token' }]
+    ],
+    resize_keyboard: true
+  }
+};
+
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, 'Welcome to CryptoMonitor Bot!\n\nCommands:\n/add <amount> <ticker> - Add an amount of crypto to monitor\n/remove <ticker> - Remove a crypto ticker\n/list - List your monitored tickers and amounts\n/prices - Get current prices and portfolio value');
+  bot.sendMessage(
+    chatId, 
+    'Welcome to CryptoMonitor Bot! 🚀\n\nUse the buttons below to manage your crypto portfolio:\n\n' +
+    '📊 Get Prices - View current prices and portfolio value\n' +
+    '📋 List Tokens - See your monitored tokens\n' +
+    '➕ Add Token - Add new token (use /add <amount> <ticker>)\n' +
+    '➖ Remove Token - Remove existing token',
+    mainKeyboard
+  );
+});
+
+// Handle button clicks
+bot.on('message', (msg) => {
+  const chatId = msg.chat.id;
+  
+  switch (msg.text) {
+    case '📊 Get Prices':
+      bot.onText(/\/prices/, msg);
+      break;
+    case '📋 List Tokens':
+      bot.onText(/\/list/, msg);
+      break;
+    case '➕ Add Token':
+      bot.sendMessage(chatId, 'To add a token, use the command:\n/add <amount> <ticker>\nExample: /add 0.5 btc');
+      break;
+    case '➖ Remove Token':
+      bot.sendMessage(chatId, 'To remove a token, use the command:\n/remove <ticker>\nExample: /remove btc');
+      break;
+  }
 });
 
 bot.onText(/\/add (.+)/, (msg, match) => {
