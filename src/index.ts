@@ -527,7 +527,7 @@ setInterval(async () => {
         );
         
         if (userAlerts.length > 0) {
-          const message = userAlerts.map(alert => {
+          const message = userAlerts.map((alert: AnomalyAlert) => {
             const direction = alert.change > 0 ? 'increased' : 'decreased';
             const changeAbs = Math.abs(alert.change).toFixed(2);
             return `${alert.coin} ${alert.type} has ${direction} by ${changeAbs}% over the last ${alert.period}`;

@@ -10,7 +10,7 @@ const calculateSMA = (prices: number[], period: number): number => {
 class CryptoService {
   private readonly baseUrl = 'https://api.coingecko.com/api/v3';
   
-  public async getPricesAndVolumes(tickers: string[]): Promise<PriceVolume[]> {
+  public async getPricesAndVolumes(tickers: string[]): Promise<Array<PriceVolume>> {
     try {
       const response = await axios.get(`${this.baseUrl}/simple/price`, {
         params: {
