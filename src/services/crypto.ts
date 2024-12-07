@@ -12,23 +12,41 @@ class CryptoService {
   
   public async getPricesAndVolumes(tickers: string[]): Promise<Array<PriceVolume>> {
     try {
-      const response = await axios.get(`${this.baseUrl}/simple/price`, {
-        params: {
-          ids: tickers.join(','),
-          vs_currencies: 'usd',
-          include_24hr_vol: true
-        }
-      });
+      const now = Date.now();
+      const oneDayAgo = now - 24 * 60 * 60 * 1000;
+      
+      const candlePromises = tickers.map(ticker => 
+        axios.get(`${this.baseUrl}/coins/${ticker}/market_chart`, {
+          params: {
+            vs_currency: 'usd',
+            from: Math.floor(oneDayAgo / 1000),
+            to: Math.floor(now / 1000),
+            interval: 'hourly'
+          }
+        })
+      );
 
-      return Object.entries(response.data).map(([id, data]: [string, any]) => ({
-        id,
-        symbol: id,
-        price: data.usd,
-        volume: data.usd_24h_vol || 0,
-        timestamp: Date.now()
-      }));
+      const responses = await Promise.all(candlePromises);
+      
+      return responses.map((response, index) => {
+        const data = response.data;
+        const prices = data.prices || [];
+        const volumes = data.total_volumes || [];
+        
+        // Get latest values
+        const latestPrice = prices[prices.length - 1]?.[1] || 0;
+        const latestVolume = volumes[volumes.length - 1]?.[1] || 0;
+        
+        return {
+          id: tickers[index],
+          symbol: tickers[index],
+          price: latestPrice,
+          volume: latestVolume,
+          timestamp: now
+        };
+      });
     } catch (error) {
-      console.error('Error fetching prices and volumes:', error);
+      console.error('Error fetching candle data:', error);
       return [];
     }
   }

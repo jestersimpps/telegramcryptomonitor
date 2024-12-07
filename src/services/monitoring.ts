@@ -24,33 +24,38 @@ class MonitoringService {
     const tickers = Array.from(uniqueTickers);
     if (tickers.length === 0) return alerts;
 
-    const currentMetrics = await cryptoService.getPricesAndVolumes(tickers);
-    
-    currentMetrics.forEach(metric => {
-      let history = this.priceHistory.get(metric.id) || [];
+    try {
+      const now = Date.now();
+      const oneDayAgo = now - 24 * 60 * 60 * 1000;
       
-      // Add new data point
-      history.push(metric);
-      
-      // Keep only last 24 hours
-      if (history.length > this.HISTORY_LENGTH) {
-        history = history.slice(-this.HISTORY_LENGTH);
-      }
-      
-      this.priceHistory.set(metric.id, history);
+      const candlePromises = tickers.map(ticker => 
+        axios.get(`${this.baseUrl}/coins/${ticker}/market_chart`, {
+          params: {
+            vs_currency: 'usd',
+            from: Math.floor(oneDayAgo / 1000),
+            to: Math.floor(now / 1000),
+            interval: 'hourly'
+          }
+        })
+      );
 
-      // Check for anomalies if we have enough history
-      if (history.length > 2) {
-        const dayAgoIndex = Math.max(0, history.length - 1440);
-        const hourAgoIndex = Math.max(0, history.length - 60);
+      const responses = await Promise.all(candlePromises);
+      
+      responses.forEach((response, index) => {
+        const ticker = tickers[index];
+        const data = response.data;
+        const prices = data.prices || [];
+        const volumes = data.total_volumes || [];
         
-        const currentPrice = metric.price;
-        const dayAgoPrice = history[dayAgoIndex].price;
-        const hourAgoPrice = history[hourAgoIndex].price;
+        if (prices.length < 2 || volumes.length < 2) return;
+
+        const currentPrice = prices[prices.length - 1][1];
+        const hourAgoPrice = prices[prices.length - 2][1];
+        const dayAgoPrice = prices[0][1];
         
-        const currentVolume = metric.volume;
-        const dayAgoVolume = history[dayAgoIndex].volume;
-        const hourAgoVolume = history[hourAgoIndex].volume;
+        const currentVolume = volumes[volumes.length - 1][1];
+        const hourAgoVolume = volumes[volumes.length - 2][1];
+        const dayAgoVolume = volumes[0][1];
 
         // Calculate percentage changes
         const dayPriceChange = ((currentPrice - dayAgoPrice) / dayAgoPrice) * 100;
