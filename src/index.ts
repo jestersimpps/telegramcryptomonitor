@@ -75,7 +75,10 @@ bot.on("message", (msg) => {
      "/add <amount> <ticker> - Add crypto to portfolio\n" +
      "/remove <ticker> - Remove crypto from portfolio\n" +
      "/list - List all your crypto holdings\n" +
-     "/prices - Get current prices"
+     "/prices - Get current prices\n\n" +
+     "Update Timer:\n" +
+     "/settime HH:mm - Set daily update time (24h format)\n" +
+     "/removetime - Remove daily update timer"
    );
    break;
   }
