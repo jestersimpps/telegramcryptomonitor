@@ -72,12 +72,7 @@ bot.on("message", (msg) => {
      "/add <amount> <ticker> - Add crypto to portfolio\n" +
      "/remove <ticker> - Remove crypto from portfolio\n" +
      "/list - List all your crypto holdings\n" +
-     "/prices - Get current prices\n\n" +
-     "Commodity Commands:\n" +
-     "/addcom <amount> <symbol> - Add commodity (e.g., XAU, XAG)\n" +
-     "/removecom <symbol> - Remove commodity\n" +
-     "/commodities - List commodity holdings\n" +
-     "/comprices - Get commodity prices"
+     "/prices - Get current prices"
    );
    break;
   }
