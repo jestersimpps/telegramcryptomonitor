@@ -437,7 +437,7 @@ bot.onText(/\/removetime/, (msg) => {
   const chatId = msg.chat.id;
   removeUserSchedule(chatId);
   storageService.removeUpdateTime(chatId);
-  bot.sendMessage(chatId, "Daily update timer removed");
+  bot.sendMessage(chatId, "Daily update timer removed", mainKeyboard);
  } catch (error) {
   logger.error("Error removing update time:", error);
   bot.sendMessage(
