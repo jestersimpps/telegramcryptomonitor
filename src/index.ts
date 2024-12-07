@@ -23,7 +23,7 @@ interface CryptoPrice {
 // Constants
 const CACHE_DURATION = 60 * 1000; // 1 minute
 const RATE_LIMIT = 500; // 5 m seconds
-const MONITORING_INTERVAL = 60 * 1000; // 1 minute
+const MONITORING_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 import { monitoringService } from './services/monitoring';
 import { AnomalyAlert } from './types';
@@ -520,27 +520,6 @@ setInterval(async () => {
   try {
     const alerts = await monitoringService.updateMetrics();
     
-    // Debug log current metrics with changes
-    const users = storageService.getAllUsers();
-    users.forEach(async user => {
-      const tickers = Array.from(user.tickers.keys());
-      const metrics = await cryptoService.getPricesAndVolumes(tickers);
-      
-      const summaries = metrics.map(metric => {
-        const history = monitoringService.getHistory(metric.id);
-        if (!history || history.length < 2) return `${metric.symbol.toUpperCase()}: No history yet`;
-        
-        const hourAgo = history[Math.max(0, history.length - 60)];
-        const priceChange = ((metric.price - hourAgo.price) / hourAgo.price) * 100;
-        const volumeChange = ((metric.volume - hourAgo.volume) / hourAgo.volume) * 100;
-        
-        return `${metric.symbol.toUpperCase()}: Price ${priceChange.toFixed(2)}% | Vol ${volumeChange.toFixed(2)}%`;
-      });
-      
-      bot.sendMessage(user.chatId, `🔍 Debug:\n${summaries.join('\n')}`);
-    });
-    
-    // Send alerts to all users who have the relevant coins
     if (alerts.length > 0) {
       const users = storageService.getAllUsers();
       
