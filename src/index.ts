@@ -189,7 +189,16 @@ async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
   const priceChange = price.price_change_percentage_24h !== undefined && price.price_change_percentage_24h !== null
     ? ` (${price.price_change_percentage_24h.toFixed(2)}% 24h)`
     : '';
-  return `${price.symbol.toUpperCase()} (${amount}):\n$${formatPrice(price.current_price)}${priceChange}\nValue: $${formatPrice(value)}`;
+  
+  let message = `${price.symbol.toUpperCase()} (${amount}):\n$${formatPrice(price.current_price)}${priceChange}\nValue: $${formatPrice(value)}`;
+  
+  // Add Pi Cycle indicator for Bitcoin
+  if (price.id === 'bitcoin' && price.piCycle) {
+    const { sma111, sma350x2, distance } = price.piCycle;
+    message += `\nPi Cycle:\nSMA111: $${formatPrice(sma111)}\nSMA350*2: $${formatPrice(sma350x2)}\nDistance: ${distance.toFixed(2)}%`;
+  }
+  
+  return message;
  });
 
  const message = `Current Portfolio:\n\n${priceMessages.join(

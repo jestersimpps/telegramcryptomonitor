@@ -9,4 +9,9 @@ export interface CryptoPrice {
   symbol: string;
   current_price: number;
   price_change_percentage_24h?: number;
+  piCycle?: {
+    sma111: number;
+    sma350x2: number;
+    distance: number;
+  };
 }
