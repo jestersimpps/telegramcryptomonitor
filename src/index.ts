@@ -256,6 +256,11 @@ bot.onText(/\/picycle/, async (msg) => {
   }
 
   const btc = prices[0];
+  if (!btc.piCycle) {
+    bot.sendMessage(chatId, "Unable to calculate Pi Cycle indicators at the moment.");
+    return;
+  }
+
   const { sma111, sma350x2, distance } = btc.piCycle;
   
   const message = `Bitcoin Pi Cycle Top Indicator:\n\n` +
