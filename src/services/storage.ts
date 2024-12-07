@@ -21,7 +21,6 @@ class StorageService {
             // Reconstruct the tickers Map from the plain object
             const userData = value as UserData;
             userData.tickers = new Map(Object.entries(userData.tickers || {}));
-            userData.commodities = new Map(Object.entries(userData.commodities || {}));
             return [parseInt(key), userData];
           })
         );
@@ -42,8 +41,7 @@ class StorageService {
           key,
           {
             ...userData,
-            tickers: Object.fromEntries(userData.tickers),
-            commodities: Object.fromEntries(userData.commodities)
+            tickers: Object.fromEntries(userData.tickers)
           }
         ])
       );
@@ -54,15 +52,11 @@ class StorageService {
   }
 
   public getUser(chatId: number): UserData | undefined {
-    const userData = this.users.get(chatId);
-    if (userData && !userData.commodities) {
-      userData.commodities = new Map();
-    }
-    return userData;
+    return this.users.get(chatId);
   }
 
   public addTicker(chatId: number, ticker: string, amount: number): void {
-    const userData = this.users.get(chatId) || { chatId, tickers: new Map(), commodities: new Map() };
+    const userData = this.users.get(chatId) || { chatId, tickers: new Map() };
     userData.tickers.set(ticker.toLowerCase(), amount);
     this.users.set(chatId, userData);
     this.saveData();
@@ -81,21 +75,6 @@ class StorageService {
     return Array.from(this.users.values());
   }
 
-  public addCommodity(chatId: number, symbol: string, amount: number): void {
-    const userData = this.users.get(chatId) || { chatId, tickers: new Map(), commodities: new Map() };
-    userData.commodities.set(symbol.toLowerCase(), amount);
-    this.users.set(chatId, userData);
-    this.saveData();
-  }
-
-  public removeCommodity(chatId: number, symbol: string): void {
-    const userData = this.users.get(chatId);
-    if (userData) {
-      userData.commodities.delete(symbol.toLowerCase());
-      this.users.set(chatId, userData);
-      this.saveData();
-    }
-  }
 }
 
 export const storageService = new StorageService();
