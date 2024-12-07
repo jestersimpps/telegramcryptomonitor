@@ -16,3 +16,20 @@ export interface CryptoPrice {
     daysToTop?: number;
   };
 }
+
+export interface PriceVolume {
+  id: string;
+  symbol: string;
+  price: number;
+  volume: number;
+  timestamp: number;
+}
+
+export interface AnomalyAlert {
+  type: 'price' | 'volume';
+  coin: string;
+  change: number;
+  period: '1h' | '24h';
+  currentValue: number;
+  previousValue: number;
+}

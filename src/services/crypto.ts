@@ -9,6 +9,29 @@ const calculateSMA = (prices: number[], period: number): number => {
 
 class CryptoService {
   private readonly baseUrl = 'https://api.coingecko.com/api/v3';
+  
+  public async getPricesAndVolumes(tickers: string[]): Promise<PriceVolume[]> {
+    try {
+      const response = await axios.get(`${this.baseUrl}/simple/price`, {
+        params: {
+          ids: tickers.join(','),
+          vs_currencies: 'usd',
+          include_24hr_vol: true
+        }
+      });
+
+      return Object.entries(response.data).map(([id, data]: [string, any]) => ({
+        id,
+        symbol: id,
+        price: data.usd,
+        volume: data.usd_24h_vol || 0,
+        timestamp: Date.now()
+      }));
+    } catch (error) {
+      console.error('Error fetching prices and volumes:', error);
+      return [];
+    }
+  }
 
   public async getPrices(tickers: string[]): Promise<CryptoPrice[]> {
     try {

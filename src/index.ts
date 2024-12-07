@@ -23,6 +23,9 @@ interface CryptoPrice {
 // Constants
 const CACHE_DURATION = 60 * 1000; // 1 minute
 const RATE_LIMIT = 500; // 5 m seconds
+const MONITORING_INTERVAL = 60 * 1000; // 1 minute
+
+import { monitoringService } from './services/monitoring';
 
 // Environment setup
 dotenv.config();
@@ -508,5 +511,35 @@ process.on("SIGINT", () => {
  Array.from(userJobs.values()).forEach((job) => job.cancel());
  process.exit(0);
 });
+
+// Start price monitoring
+setInterval(async () => {
+  try {
+    const alerts = await monitoringService.updateMetrics();
+    
+    // Send alerts to all users who have the relevant coins
+    if (alerts.length > 0) {
+      const users = storageService.getAllUsers();
+      
+      users.forEach(user => {
+        const userAlerts = alerts.filter(alert => 
+          user.tickers.has(alert.coin.toLowerCase())
+        );
+        
+        if (userAlerts.length > 0) {
+          const message = userAlerts.map(alert => {
+            const direction = alert.change > 0 ? 'increased' : 'decreased';
+            const changeAbs = Math.abs(alert.change).toFixed(2);
+            return `${alert.coin} ${alert.type} has ${direction} by ${changeAbs}% over the last ${alert.period}`;
+          }).join('\n');
+          
+          bot.sendMessage(user.chatId, `🚨 Alert!\n\n${message}`);
+        }
+      });
+    }
+  } catch (error) {
+    logger.error('Error in monitoring loop:', error);
+  }
+}, MONITORING_INTERVAL);
 
 logger.info("Bot started successfully");
