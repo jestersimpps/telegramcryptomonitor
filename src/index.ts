@@ -3,6 +3,7 @@ import schedule from "node-schedule";
 import dotenv from "dotenv";
 import { storageService } from "./services/storage";
 import { cryptoService } from "./services/crypto";
+import { commoditiesService } from "./services/commodities";
 import { KeyboardButton } from "node-telegram-bot-api";
 
 dotenv.config();
@@ -142,6 +143,26 @@ bot.onText(/\/prices/, async (msg) => {
  await sendPriceUpdate(chatId, userData.tickers);
 });
 
+bot.onText(/\/commodities/, async (msg) => {
+ const chatId = msg.chat.id;
+ const userData = storageService.getUser(chatId);
+ if (!userData || !userData.commodities || userData.commodities.size === 0) {
+  bot.sendMessage(chatId, "You have no commodities in your monitoring list.");
+  return;
+ }
+ await sendCommodityList(chatId, userData.commodities);
+});
+
+bot.onText(/\/comprices/, async (msg) => {
+ const chatId = msg.chat.id;
+ const userData = storageService.getUser(chatId);
+ if (!userData || !userData.commodities || userData.commodities.size === 0) {
+  bot.sendMessage(chatId, "You have no commodities in your monitoring list.");
+  return;
+ }
+ await sendCommodityPriceUpdate(chatId, userData.commodities);
+});
+
 // Function to send token list with prices
 async function sendTokenList(chatId: number, tickers: Map<string, number>) {
  const tickerIds = Array.from(tickers.keys());
@@ -160,6 +181,48 @@ async function sendTokenList(chatId: number, tickers: Map<string, number>) {
  }).join("\n");
 
  const message = `Your monitored tokens:\n${tokenList}\n\nTotal Portfolio Value: $${totalValue.toFixed(2)}`;
+ bot.sendMessage(chatId, message);
+}
+
+// Function to send commodity list with prices
+async function sendCommodityList(chatId: number, commodities: Map<string, number>) {
+ const symbols = Array.from(commodities.keys());
+ const prices = await commoditiesService.getPrices(symbols);
+ if (prices.length === 0) {
+  bot.sendMessage(chatId, "Unable to fetch commodity prices at the moment.");
+  return;
+ }
+
+ let totalValue = 0;
+ const commodityList = prices.map((price) => {
+  const amount = commodities.get(price.id) || 0;
+  const value = amount * price.current_price;
+  totalValue += value;
+  return `${price.symbol}: ${amount} @ $${price.current_price.toFixed(2)} = $${value.toFixed(2)}`;
+ }).join("\n");
+
+ const message = `Your monitored commodities:\n${commodityList}\n\nTotal Portfolio Value: $${totalValue.toFixed(2)}`;
+ bot.sendMessage(chatId, message);
+}
+
+// Function to send commodity price updates
+async function sendCommodityPriceUpdate(chatId: number, commodities: Map<string, number>) {
+ const symbols = Array.from(commodities.keys());
+ const prices = await commoditiesService.getPrices(symbols);
+ if (prices.length === 0) {
+  bot.sendMessage(chatId, "Unable to fetch commodity prices at the moment.");
+  return;
+ }
+
+ let totalValue = 0;
+ const priceMessages = prices.map((price) => {
+  const amount = commodities.get(price.id) || 0;
+  const value = amount * price.current_price;
+  totalValue += value;
+  return `${price.symbol} (${amount}):\n$${price.current_price.toFixed(2)} (${price.price_change_percentage_24h.toFixed(2)}% 24h)\nValue: $${value.toFixed(2)}`;
+ });
+
+ const message = `Current Commodity Portfolio:\n\n${priceMessages.join("\n\n")}\n\nTotal Portfolio Value: $${totalValue.toFixed(2)}`;
  bot.sendMessage(chatId, message);
 }
 
