@@ -57,10 +57,7 @@ bot.on("message", (msg) => {
     bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
     return;
    }
-   const tickerList = Array.from(userData.tickers.entries())
-    .map(([ticker, amount]) => `${ticker.toUpperCase()}: ${amount}`)
-    .join("\n");
-   bot.sendMessage(chatId, `Your monitored tickers:\n${tickerList}`);
+   sendTokenList(chatId, userData.tickers);
    break;
   }
  }
@@ -105,10 +102,7 @@ bot.onText(/\/list/, async (msg) => {
   bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
   return;
  }
- const tickerList = Array.from(userData.tickers.entries())
-  .map(([ticker, amount]) => `${ticker.toUpperCase()}: ${amount}`)
-  .join("\n");
- bot.sendMessage(chatId, `Your monitored tickers:\n${tickerList}`);
+ await sendTokenList(chatId, userData.tickers);
 });
 
 bot.onText(/\/prices/, async (msg) => {
@@ -121,6 +115,27 @@ bot.onText(/\/prices/, async (msg) => {
 
  await sendPriceUpdate(chatId, userData.tickers);
 });
+
+// Function to send token list with prices
+async function sendTokenList(chatId: number, tickers: Map<string, number>) {
+ const tickerIds = Array.from(tickers.keys());
+ const prices = await cryptoService.getPrices(tickerIds);
+ if (prices.length === 0) {
+  bot.sendMessage(chatId, "Unable to fetch prices at the moment.");
+  return;
+ }
+
+ let totalValue = 0;
+ const tokenList = prices.map((price) => {
+  const amount = tickers.get(price.id) || 0;
+  const value = amount * price.current_price;
+  totalValue += value;
+  return `${price.symbol.toUpperCase()}: ${amount} @ $${price.current_price.toFixed(2)} = $${value.toFixed(2)}`;
+ }).join("\n");
+
+ const message = `Your monitored tokens:\n${tokenList}\n\nTotal Portfolio Value: $${totalValue.toFixed(2)}`;
+ bot.sendMessage(chatId, message);
+}
 
 // Function to send price updates
 async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
