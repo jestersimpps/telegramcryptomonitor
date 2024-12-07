@@ -4,6 +4,10 @@ import { PriceVolume, AnomalyAlert } from '../types';
 
 class MonitoringService {
   private priceHistory: Map<string, PriceVolume[]> = new Map();
+
+  public getHistory(ticker: string): PriceVolume[] | undefined {
+    return this.priceHistory.get(ticker);
+  }
   private readonly HISTORY_LENGTH = 1440; // 24 hours of minute data
   private readonly PRICE_THRESHOLD = 5; // 5% change
   private readonly VOLUME_THRESHOLD = 5; // 5% change
