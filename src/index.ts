@@ -71,7 +71,7 @@ bot.on("message", (msg) => {
 
  switch (msg.text) {
   case "📈 Pi Cycle": {
-   bot.emit("text", msg, ["/picycle"]);
+   bot.onText(/\/picycle/, msg);
    break;
   }
   case "📊 Get Prices": {
