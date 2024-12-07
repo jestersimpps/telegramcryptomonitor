@@ -27,7 +27,7 @@ bot.onText(/\/start/, (msg) => {
  const chatId = msg.chat.id;
  bot.sendMessage(
   chatId,
-  "Welcome to CryptoMonitor Bot! 🚀\n\n" +
+  "Welcome to CryptoMonitor Bot!🚀\n\n" +
    "Use the buttons below or type /help to see all available commands.\n\n" +
    "📊 Get Prices - View current prices and portfolio value\n" +
    "❓ Help - Show all commands",
