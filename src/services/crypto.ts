@@ -53,22 +53,28 @@ class CryptoService {
       const oneDayAgo = now - 24 * 60 * 60 * 1000;
       
         const batchPromises = batchTickers.map(async ticker => {
-          const data = await this.makeRequest(`${this.baseUrl}/coins/${ticker}/market_chart`, {
+          interface MarketChartData {
+            prices: [number, number][];
+            total_volumes: [number, number][];
+          }
+
+          const data = await this.makeRequest<MarketChartData>(`${this.baseUrl}/coins/${ticker}/market_chart`, {
             vs_currency: 'usd',
             from: Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000),
             to: Math.floor(Date.now() / 1000),
             interval: 'hourly'
           });
           
-          const prices = data.prices || [];
-          const volumes = data.total_volumes || [];
+          const prices = data.prices;
+          const volumes = data.total_volumes;
+          const timestamp = Date.now();
           
           return {
             id: ticker,
             symbol: ticker,
             price: prices[prices.length - 1]?.[1] || 0,
             volume: volumes[volumes.length - 1]?.[1] || 0,
-            timestamp: Date.now()
+            timestamp
           };
         });
 
@@ -82,24 +88,6 @@ class CryptoService {
       }
 
       return results;
-      
-      return responses.map((response, index) => {
-        const data = response.data;
-        const prices = data.prices || [];
-        const volumes = data.total_volumes || [];
-        
-        // Get latest values
-        const latestPrice = prices[prices.length - 1]?.[1] || 0;
-        const latestVolume = volumes[volumes.length - 1]?.[1] || 0;
-        
-        return {
-          id: tickers[index],
-          symbol: tickers[index],
-          price: latestPrice,
-          volume: latestVolume,
-          timestamp: now
-        };
-      });
     } catch (error) {
       console.error('Error fetching candle data:', error);
       return [];
