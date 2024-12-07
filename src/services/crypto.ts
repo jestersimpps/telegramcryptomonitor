@@ -1,6 +1,12 @@
 import axios from 'axios';
 import { CryptoPrice, PriceVolume } from '../types';
 
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const MAX_RETRIES = 3;
+const INITIAL_RETRY_DELAY = 1000; // 1 second
+const MAX_RETRY_DELAY = 10000; // 10 seconds
+
 const calculateSMA = (prices: number[], period: number): number => {
   if (prices.length < period) return 0;
   const sum = prices.slice(-period).reduce((acc, price) => acc + price, 0);
@@ -10,23 +16,72 @@ const calculateSMA = (prices: number[], period: number): number => {
 class CryptoService {
   private readonly baseUrl = 'https://api.coingecko.com/api/v3';
   
+  private async makeRequest<T>(url: string, params: any): Promise<T> {
+    let retries = 0;
+    let delay = INITIAL_RETRY_DELAY;
+
+    while (retries < MAX_RETRIES) {
+      try {
+        const response = await axios.get(url, { params });
+        await sleep(1000); // Wait 1 second between successful requests
+        return response.data;
+      } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response?.status === 429) {
+          retries++;
+          if (retries === MAX_RETRIES) throw error;
+          
+          console.log(`Rate limited, waiting ${delay}ms before retry ${retries}`);
+          await sleep(delay);
+          delay = Math.min(delay * 2, MAX_RETRY_DELAY);
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error('Max retries exceeded');
+  }
+
   public async getPricesAndVolumes(tickers: string[]): Promise<Array<PriceVolume>> {
     try {
+      // Process tickers in smaller batches to avoid rate limits
+      const BATCH_SIZE = 3;
+      const results: PriceVolume[] = [];
+      
+      for (let i = 0; i < tickers.length; i += BATCH_SIZE) {
+        const batchTickers = tickers.slice(i, i + BATCH_SIZE);
       const now = Date.now();
       const oneDayAgo = now - 24 * 60 * 60 * 1000;
       
-      const candlePromises = tickers.map(ticker => 
-        axios.get(`${this.baseUrl}/coins/${ticker}/market_chart`, {
-          params: {
+        const batchPromises = batchTickers.map(async ticker => {
+          const data = await this.makeRequest(`${this.baseUrl}/coins/${ticker}/market_chart`, {
             vs_currency: 'usd',
-            from: Math.floor(oneDayAgo / 1000),
-            to: Math.floor(now / 1000),
+            from: Math.floor((Date.now() - 24 * 60 * 60 * 1000) / 1000),
+            to: Math.floor(Date.now() / 1000),
             interval: 'hourly'
-          }
-        })
-      );
+          });
+          
+          const prices = data.prices || [];
+          const volumes = data.total_volumes || [];
+          
+          return {
+            id: ticker,
+            symbol: ticker,
+            price: prices[prices.length - 1]?.[1] || 0,
+            volume: volumes[volumes.length - 1]?.[1] || 0,
+            timestamp: Date.now()
+          };
+        });
 
-      const responses = await Promise.all(candlePromises);
+        const batchResults = await Promise.all(batchPromises);
+        results.push(...batchResults);
+        
+        // Add delay between batches
+        if (i + BATCH_SIZE < tickers.length) {
+          await sleep(2000); // 2 second delay between batches
+        }
+      }
+
+      return results;
       
       return responses.map((response, index) => {
         const data = response.data;
