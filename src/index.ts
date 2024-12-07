@@ -61,7 +61,7 @@ bot.onText(/\/list/, async (msg) => {
 bot.onText(/\/prices/, async (msg) => {
   const chatId = msg.chat.id;
   const userData = storageService.getUser(chatId);
-  if (!userData || userData.tickers.length === 0) {
+  if (!userData || userData.tickers.size === 0) {
     bot.sendMessage(chatId, 'You have no tickers in your monitoring list.');
     return;
   }
@@ -94,7 +94,7 @@ async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
 schedule.scheduleJob('30 8 * * *', async () => {
   const users = storageService.getAllUsers();
   for (const user of users) {
-    if (user.tickers.length > 0) {
+    if (user.tickers.size > 0) {
       await sendPriceUpdate(user.chatId, user.tickers);
     }
   }
