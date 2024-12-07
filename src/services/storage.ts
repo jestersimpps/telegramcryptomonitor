@@ -75,6 +75,22 @@ class StorageService {
     return Array.from(this.users.values());
   }
 
+  public setUpdateTime(chatId: number, time: string): void {
+    const userData = this.users.get(chatId) || { chatId, tickers: new Map() };
+    userData.updateTime = time;
+    this.users.set(chatId, userData);
+    this.saveData();
+  }
+
+  public removeUpdateTime(chatId: number): void {
+    const userData = this.users.get(chatId);
+    if (userData) {
+      delete userData.updateTime;
+      this.users.set(chatId, userData);
+      this.saveData();
+    }
+  }
+
 }
 
 export const storageService = new StorageService();

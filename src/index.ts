@@ -45,7 +45,10 @@ bot.onText(/\/help/, (msg) => {
    "/add <amount> <ticker> - Add crypto to portfolio\n" +
    "/remove <ticker> - Remove crypto from portfolio\n" +
    "/list - List all your crypto holdings\n" +
-   "/prices - Get current prices\n"
+   "/prices - Get current prices\n\n" +
+   "Update Timer:\n" +
+   "/settime HH:mm - Set daily update time (24h format)\n" +
+   "/removetime - Remove daily update timer"
  );
 });
 
@@ -182,11 +185,37 @@ async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
  bot.sendMessage(chatId, message);
 }
 
-// Schedule daily updates at 8:30 AM
-schedule.scheduleJob("30 8 * * *", async () => {
+// Handle update time setting
+bot.onText(/\/settime (.+)/, (msg, match) => {
+ if (!match) return;
+ const chatId = msg.chat.id;
+ const timeStr = match[1].trim();
+ 
+ // Validate time format (HH:mm)
+ const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+ if (!timeRegex.test(timeStr)) {
+  bot.sendMessage(chatId, "Please provide time in 24-hour format (HH:mm)\nExample: /settime 08:30");
+  return;
+ }
+
+ storageService.setUpdateTime(chatId, timeStr);
+ bot.sendMessage(chatId, `Daily update time set to ${timeStr}`);
+});
+
+bot.onText(/\/removetime/, (msg) => {
+ const chatId = msg.chat.id;
+ storageService.removeUpdateTime(chatId);
+ bot.sendMessage(chatId, "Daily update timer removed");
+});
+
+// Schedule updates for each user based on their preferred time
+schedule.scheduleJob('* * * * *', async () => {
  const users = storageService.getAllUsers();
+ const now = new Date();
+ const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
  for (const user of users) {
-  if (user.tickers.size > 0) {
+  if (user.updateTime === currentTime && user.tickers.size > 0) {
    await sendPriceUpdate(user.chatId, user.tickers);
   }
  }
