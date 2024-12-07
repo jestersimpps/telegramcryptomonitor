@@ -12,6 +12,17 @@ if (!token) {
  throw new Error("TELEGRAM_BOT_TOKEN must be provided!");
 }
 
+// Helper function to format prices with appropriate decimal places
+function formatPrice(price: number): string {
+  if (price < 0.01) {
+    return price.toFixed(8);
+  } else if (price < 1) {
+    return price.toFixed(4);
+  } else {
+    return price.toFixed(2);
+  }
+}
+
 const bot = new TelegramBot(token, { polling: true });
 
 // Command handlers
@@ -153,7 +164,7 @@ async function sendTokenList(chatId: number, tickers: Map<string, number>) {
   const amount = tickers.get(price.id) || 0;
   const value = amount * price.current_price;
   totalValue += value;
-  return `${price.symbol.toUpperCase()}: ${amount} @ $${price.current_price.toFixed(2)} = $${value.toFixed(2)}`;
+  return `${price.symbol.toUpperCase()}: ${amount} @ $${formatPrice(price.current_price)} = $${formatPrice(value)}`;
  }).join("\n");
 
  const message = `Your monitored tokens:\n${tokenList}\n\nTotal Portfolio Value: $${totalValue.toFixed(2)}`;
@@ -178,7 +189,7 @@ async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
   const priceChange = price.price_change_percentage_24h !== undefined && price.price_change_percentage_24h !== null
     ? ` (${price.price_change_percentage_24h.toFixed(2)}% 24h)`
     : '';
-  return `${price.symbol.toUpperCase()} (${amount}):\n$${price.current_price.toFixed(2)}${priceChange}\nValue: $${value.toFixed(2)}`;
+  return `${price.symbol.toUpperCase()} (${amount}):\n$${formatPrice(price.current_price)}${priceChange}\nValue: $${formatPrice(value)}`;
  });
 
  const message = `Current Portfolio:\n\n${priceMessages.join(
