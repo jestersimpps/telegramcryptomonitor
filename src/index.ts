@@ -518,6 +518,12 @@ setInterval(async () => {
   try {
     const alerts = await monitoringService.updateMetrics();
     
+    // Debug log current metrics
+    const users = storageService.getAllUsers();
+    users.forEach(user => {
+      bot.sendMessage(user.chatId, `🔍 Debug: Checking ${Array.from(user.tickers.keys()).join(', ')}`);
+    });
+    
     // Send alerts to all users who have the relevant coins
     if (alerts.length > 0) {
       const users = storageService.getAllUsers();
