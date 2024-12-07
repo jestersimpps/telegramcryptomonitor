@@ -175,11 +175,10 @@ async function sendPriceUpdate(chatId: number, tickers: Map<string, number>) {
   const amount = tickers.get(price.id) || 0;
   const value = amount * price.current_price;
   totalValue += value;
-  return `${price.symbol.toUpperCase()} (${amount}):\n$${price.current_price.toFixed(
-   2
-  )} (${price.price_change_percentage_24h.toFixed(
-   2
-  )}% 24h)\nValue: $${value.toFixed(2)}`;
+  const priceChange = price.price_change_percentage_24h !== undefined && price.price_change_percentage_24h !== null
+    ? ` (${price.price_change_percentage_24h.toFixed(2)}% 24h)`
+    : '';
+  return `${price.symbol.toUpperCase()} (${amount}):\n$${price.current_price.toFixed(2)}${priceChange}\nValue: $${value.toFixed(2)}`;
  });
 
  const message = `Current Portfolio:\n\n${priceMessages.join(
