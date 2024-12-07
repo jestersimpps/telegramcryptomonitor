@@ -191,7 +191,7 @@ bot.on("message", async (msg) => {
       `\nWhen the 111 SMA crosses above the 350 SMA × 2,\n` +
       `it historically indicates a market top.`;
 
-     bot.sendMessage(chatId, message);
+     bot.sendMessage(chatId, message, mainKeyboard);
     }
     break;
    }
@@ -293,7 +293,7 @@ bot.onText(/\/list/, async (msg) => {
 
   const userData = storageService.getUser(chatId);
   if (!userData || userData.tickers.size === 0) {
-   bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
+   bot.sendMessage(chatId, "You have no tickers in your monitoring list.", mainKeyboard);
    return;
   }
 
