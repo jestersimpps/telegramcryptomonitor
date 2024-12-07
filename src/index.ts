@@ -59,7 +59,9 @@ bot.onText(/\/help/, (msg) => {
    "/prices - Get current prices\n\n" +
    "Update Timer:\n" +
    "/settime HH:mm - Set daily update time (24h format)\n" +
-   "/removetime - Remove daily update timer"
+   "/removetime - Remove daily update timer\n\n" +
+   "Indicators:\n" +
+   "/picycle - Show Bitcoin Pi Cycle Top indicator"
  );
 });
 
@@ -241,6 +243,30 @@ schedule.scheduleJob('* * * * *', async () => {
    await sendPriceUpdate(user.chatId, user.tickers);
   }
  }
+});
+
+// Handle Pi Cycle command
+bot.onText(/\/picycle/, async (msg) => {
+  const chatId = msg.chat.id;
+  const prices = await cryptoService.getPrices(['bitcoin']);
+  
+  if (prices.length === 0 || !prices[0].piCycle) {
+    bot.sendMessage(chatId, "Unable to fetch Bitcoin Pi Cycle data at the moment.");
+    return;
+  }
+
+  const btc = prices[0];
+  const { sma111, sma350x2, distance } = btc.piCycle;
+  
+  const message = `Bitcoin Pi Cycle Top Indicator:\n\n` +
+    `Current Price: $${formatPrice(btc.current_price)}\n` +
+    `111 SMA: $${formatPrice(sma111)}\n` +
+    `350 SMA × 2: $${formatPrice(sma350x2)}\n` +
+    `Distance: ${distance.toFixed(2)}%\n\n` +
+    `When the 111 SMA crosses above the 350 SMA × 2,\n` +
+    `it historically indicates a market top.`;
+    
+  bot.sendMessage(chatId, message);
 });
 
 console.log("Bot is running...");
