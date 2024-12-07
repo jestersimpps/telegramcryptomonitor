@@ -1,8 +1,10 @@
+import axios from 'axios';
 import { cryptoService } from './crypto';
 import { storageService } from './storage';
 import { PriceVolume, AnomalyAlert } from '../types';
 
 class MonitoringService {
+  private readonly baseUrl = 'https://api.coingecko.com/api/v3';
   private priceHistory: Map<string, PriceVolume[]> = new Map();
 
   public getHistory(ticker: string): PriceVolume[] | undefined {
@@ -41,7 +43,7 @@ class MonitoringService {
 
       const responses = await Promise.all(candlePromises);
       
-      responses.forEach((response, index) => {
+      responses.forEach((response: any, index: number) => {
         const ticker = tickers[index];
         const data = response.data;
         const prices = data.prices || [];
@@ -67,7 +69,7 @@ class MonitoringService {
         if (Math.abs(dayPriceChange) >= this.PRICE_THRESHOLD) {
           alerts.push({
             type: 'price',
-            coin: metric.symbol.toUpperCase(),
+            coin: ticker.toUpperCase(),
             change: dayPriceChange,
             period: '24h',
             currentValue: currentPrice,
@@ -107,8 +109,10 @@ class MonitoringService {
             previousValue: hourAgoVolume
           });
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error('Error fetching candle data:', error);
+    }
 
     return alerts;
   }
