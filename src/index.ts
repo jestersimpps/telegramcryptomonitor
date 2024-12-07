@@ -71,7 +71,32 @@ bot.on("message", (msg) => {
 
  switch (msg.text) {
   case "📈 Pi Cycle": {
-   bot.onText(/\/picycle/, msg);
+   const prices = await cryptoService.getPrices(["bitcoin"]);
+
+   if (prices.length === 0 || !prices[0].piCycle) {
+    bot.sendMessage(chatId, "Unable to fetch Bitcoin Pi Cycle data at the moment.");
+    return;
+   }
+
+   const btc = prices[0];
+   if (!btc.piCycle) {
+    bot.sendMessage(chatId, "Unable to calculate Pi Cycle indicators at the moment.");
+    return;
+   }
+
+   const { sma111, sma350x2, distance } = btc.piCycle;
+
+   const message =
+    `Bitcoin Pi Cycle Top Indicator:\n\n` +
+    `Current Price: $${formatPrice(btc.current_price)}\n` +
+    `111 SMA: $${formatPrice(sma111)}\n` +
+    `350 SMA × 2: $${formatPrice(sma350x2)}\n` +
+    `Distance: ${distance.toFixed(2)}%\n` +
+    `${btc.piCycle.daysToTop ? `Estimated Days to Top: ${btc.piCycle.daysToTop} days\n` : ""}` +
+    `\nWhen the 111 SMA crosses above the 350 SMA × 2,\n` +
+    `it historically indicates a market top.`;
+
+   bot.sendMessage(chatId, message);
    break;
   }
   case "📊 Get Prices": {
