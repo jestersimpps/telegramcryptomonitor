@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CryptoPrice } from '../types';
+import { CryptoPrice, PriceVolume } from '../types';
 
 const calculateSMA = (prices: number[], period: number): number => {
   if (prices.length < period) return 0;

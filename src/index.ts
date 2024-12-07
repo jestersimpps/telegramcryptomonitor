@@ -26,6 +26,7 @@ const RATE_LIMIT = 500; // 5 m seconds
 const MONITORING_INTERVAL = 60 * 1000; // 1 minute
 
 import { monitoringService } from './services/monitoring';
+import { AnomalyAlert } from './types';
 
 // Environment setup
 dotenv.config();
