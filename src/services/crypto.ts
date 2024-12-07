@@ -21,7 +21,19 @@ class CryptoService {
         price_change_percentage_24h: data.usd_24h_change
       }));
     } catch (error) {
-      console.error('Error fetching crypto prices:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error fetching crypto prices:', {
+          status: error.response?.status,
+          data: error.response?.data,
+          params: {
+            ids: tickers.join(','),
+            vs_currencies: 'usd',
+            include_24hr_change: true
+          }
+        });
+      } else {
+        console.error('Unexpected error:', error);
+      }
       return [];
     }
   }
