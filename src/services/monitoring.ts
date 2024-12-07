@@ -80,7 +80,7 @@ class MonitoringService {
         if (Math.abs(hourPriceChange) >= this.PRICE_THRESHOLD) {
           alerts.push({
             type: 'price',
-            coin: history[0].symbol.toUpperCase(),
+            coin: ticker.toUpperCase(),
             change: hourPriceChange,
             period: '1h',
             currentValue: currentPrice,
@@ -91,7 +91,7 @@ class MonitoringService {
         if (Math.abs(dayVolumeChange) >= this.VOLUME_THRESHOLD) {
           alerts.push({
             type: 'volume',
-            coin: history[0].symbol.toUpperCase(),
+            coin: ticker.toUpperCase(),
             change: dayVolumeChange,
             period: '24h',
             currentValue: currentVolume,
@@ -102,7 +102,7 @@ class MonitoringService {
         if (Math.abs(hourVolumeChange) >= this.VOLUME_THRESHOLD) {
           alerts.push({
             type: 'volume',
-            coin: history[0].symbol.toUpperCase(),
+            coin: ticker.toUpperCase(),
             change: hourVolumeChange,
             period: '1h',
             currentValue: currentVolume,

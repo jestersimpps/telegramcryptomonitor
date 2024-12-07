@@ -4,8 +4,8 @@
   "description": "Telegram bot for monitoring crypto prices",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "rm -rf dist && tsc --project tsconfig.json --listFiles --diagnostics",
+    "start": "rm -rf dist && tsc --project tsconfig.json && node dist/index.js",
+    "build": "rm -rf dist && tsc --project tsconfig.json",
     "dev": "ts-node src/index.ts",
     "watch": "tsc -w"
   },
