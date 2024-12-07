@@ -76,7 +76,7 @@ class StorageService {
   }
 
   public setUpdateTime(chatId: number, time: string): void {
-    const userData = this.users.get(chatId) || { chatId, tickers: new Map() };
+    const userData: UserData = this.users.get(chatId) || { chatId, tickers: new Map(), updateTime: undefined };
     userData.updateTime = time;
     this.users.set(chatId, userData);
     this.saveData();
