@@ -37,10 +37,29 @@ class CryptoService {
           const prices = historicalData.prices.map((p: number[]) => p[1]);
           const sma111 = calculateSMA(prices, 111);
           const sma350x2 = calculateSMA(prices, 350) * 2;
+          // Calculate days to intersection using linear regression
+          const recentPrices = prices.slice(-30); // Use last 30 days for trend
+          const sma111Trend = recentPrices.map((_, i) => {
+            return calculateSMA(prices.slice(0, prices.length - 29 + i), 111);
+          });
+          const sma350x2Trend = recentPrices.map((_, i) => {
+            return calculateSMA(prices.slice(0, prices.length - 29 + i), 350) * 2;
+          });
+
+          // Calculate daily rate of change
+          const sma111Rate = (sma111Trend[sma111Trend.length - 1] - sma111Trend[0]) / sma111Trend.length;
+          const sma350x2Rate = (sma350x2Trend[sma350x2Trend.length - 1] - sma350x2Trend[0]) / sma350x2Trend.length;
+
+          // Calculate days until intersection
+          const currentGap = sma350x2 - sma111;
+          const dailyGapChange = sma111Rate - sma350x2Rate;
+          const daysToTop = dailyGapChange !== 0 ? Math.ceil(currentGap / dailyGapChange) : undefined;
+
           price.piCycle = {
             sma111,
             sma350x2,
-            distance: ((sma111 / sma350x2) - 1) * 100 // Distance as percentage
+            distance: ((sma111 / sma350x2) - 1) * 100, // Distance as percentage
+            daysToTop: daysToTop && daysToTop > 0 ? daysToTop : undefined
           };
         }
 

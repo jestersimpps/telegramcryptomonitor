@@ -13,5 +13,6 @@ export interface CryptoPrice {
     sma111: number;
     sma350x2: number;
     distance: number;
+    daysToTop?: number;
   };
 }

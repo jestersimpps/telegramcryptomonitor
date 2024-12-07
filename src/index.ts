@@ -255,8 +255,9 @@ bot.onText(/\/picycle/, async (msg) => {
     `Current Price: $${formatPrice(btc.current_price)}\n` +
     `111 SMA: $${formatPrice(sma111)}\n` +
     `350 SMA × 2: $${formatPrice(sma350x2)}\n` +
-    `Distance: ${distance.toFixed(2)}%\n\n` +
-    `When the 111 SMA crosses above the 350 SMA × 2,\n` +
+    `Distance: ${distance.toFixed(2)}%\n` +
+    `${btc.piCycle.daysToTop ? `Estimated Days to Top: ${btc.piCycle.daysToTop} days\n` : ''}` +
+    `\nWhen the 111 SMA crosses above the 350 SMA × 2,\n` +
     `it historically indicates a market top.`;
     
   bot.sendMessage(chatId, message);
