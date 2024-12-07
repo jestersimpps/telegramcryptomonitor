@@ -39,10 +39,10 @@ class CryptoService {
           const sma350x2 = calculateSMA(prices, 350) * 2;
           // Calculate days to intersection using linear regression
           const recentPrices = prices.slice(-30); // Use last 30 days for trend
-          const sma111Trend = recentPrices.map((_, i) => {
+          const sma111Trend = recentPrices.map((_: number, i: number) => {
             return calculateSMA(prices.slice(0, prices.length - 29 + i), 111);
           });
-          const sma350x2Trend = recentPrices.map((_, i) => {
+          const sma350x2Trend = recentPrices.map((_: number, i: number) => {
             return calculateSMA(prices.slice(0, prices.length - 29 + i), 350) * 2;
           });
 
