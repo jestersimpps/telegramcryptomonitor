@@ -256,7 +256,8 @@ bot.onText(/\/add (.+)/, (msg, match) => {
   storageService.addTicker(chatId, ticker, amount);
   bot.sendMessage(
    chatId,
-   `Added ${amount} ${ticker.toUpperCase()} to your monitoring list.`
+   `Added ${amount} ${ticker.toUpperCase()} to your monitoring list.`,
+   mainKeyboard
   );
  } catch (error) {
   logger.error("Error in add command:", error);
@@ -273,7 +274,8 @@ bot.onText(/\/remove (.+)/, (msg, match) => {
   storageService.removeTicker(chatId, ticker);
   bot.sendMessage(
    chatId,
-   `Removed ${ticker.toUpperCase()} from your monitoring list.`
+   `Removed ${ticker.toUpperCase()} from your monitoring list.`,
+   mainKeyboard
   );
  } catch (error) {
   logger.error("Error in remove command:", error);
