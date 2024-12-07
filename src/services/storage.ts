@@ -16,7 +16,14 @@ class StorageService {
     try {
       if (fs.existsSync(this.dataPath)) {
         const data = JSON.parse(fs.readFileSync(this.dataPath, 'utf-8'));
-        this.users = new Map(Object.entries(data).map(([key, value]) => [parseInt(key), value as UserData]));
+        this.users = new Map(
+          Object.entries(data).map(([key, value]: [string, any]) => {
+            // Reconstruct the tickers Map from the plain object
+            const userData = value as UserData;
+            userData.tickers = new Map(Object.entries(userData.tickers || {}));
+            return [parseInt(key), userData];
+          })
+        );
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -29,7 +36,15 @@ class StorageService {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      const data = Object.fromEntries(this.users);
+      const data = Object.fromEntries(
+        Array.from(this.users.entries()).map(([key, userData]) => [
+          key,
+          {
+            ...userData,
+            tickers: Object.fromEntries(userData.tickers)
+          }
+        ])
+      );
       fs.writeFileSync(this.dataPath, JSON.stringify(data, null, 2));
     } catch (error) {
       console.error('Error saving data:', error);
