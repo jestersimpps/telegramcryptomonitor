@@ -106,9 +106,7 @@ const bot = new TelegramBot(token, { polling: true });
 const mainKeyboard = {
  reply_markup: {
   keyboard: [
-   [{ text: "📊 Get Prices" }],
-   [{ text: "📈 Pi Cycle" }],
-   [{ text: "❓ Help" }],
+   [{ text: "📊 Get Prices" }, { text: "📈 Pi Cycle" }, { text: "❓ Help" }]
   ],
   resize_keyboard: true,
  },
