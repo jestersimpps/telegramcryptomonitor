@@ -18,7 +18,7 @@ const bot = new TelegramBot(token, { polling: true });
 // Keyboard setup
 const mainKeyboard = {
  reply_markup: {
-  keyboard: [[{ text: "📊 Get Prices" }, { text: "📋 List Tokens" }]],
+  keyboard: [[{ text: "📊 Get Prices" }, { text: "❓ Help" }]],
   resize_keyboard: true,
  },
 };
@@ -27,13 +27,30 @@ bot.onText(/\/start/, (msg) => {
  const chatId = msg.chat.id;
  bot.sendMessage(
   chatId,
-  "Welcome to CryptoMonitor Bot! 🚀\n\nUse the buttons below to manage your crypto portfolio:\n\n" +
+  "Welcome to CryptoMonitor Bot! 🚀\n\n" +
+   "Use the buttons below or type /help to see all available commands.\n\n" +
    "📊 Get Prices - View current prices and portfolio value\n" +
-   "📋 List Tokens - See your monitored tokens\n\n" +
-   "Commands:\n" +
-   "/add <amount> <ticker> - Add new token\n" +
-   "/remove <ticker> - Remove token",
+   "❓ Help - Show all commands",
   mainKeyboard
+ );
+});
+
+bot.onText(/\/help/, (msg) => {
+ const chatId = msg.chat.id;
+ bot.sendMessage(
+  chatId,
+  "Available Commands:\n\n" +
+   "📊 Get Prices - View current prices and portfolio value\n\n" +
+   "Crypto Commands:\n" +
+   "/add <amount> <ticker> - Add crypto to portfolio\n" +
+   "/remove <ticker> - Remove crypto from portfolio\n" +
+   "/list - List all your crypto holdings\n" +
+   "/prices - Get current prices\n\n" +
+   "Commodity Commands:\n" +
+   "/addcom <amount> <symbol> - Add commodity (e.g., XAU, XAG)\n" +
+   "/removecom <symbol> - Remove commodity\n" +
+   "/commodities - List commodity holdings\n" +
+   "/comprices - Get commodity prices"
  );
 });
 
@@ -51,13 +68,22 @@ bot.on("message", (msg) => {
    sendPriceUpdate(chatId, userData.tickers);
    break;
   }
-  case "📋 List Tokens": {
-   const userData = storageService.getUser(chatId);
-   if (!userData || userData.tickers.size === 0) {
-    bot.sendMessage(chatId, "You have no tickers in your monitoring list.");
-    return;
-   }
-   sendTokenList(chatId, userData.tickers);
+  case "❓ Help": {
+   bot.sendMessage(
+    chatId,
+    "Available Commands:\n\n" +
+     "📊 Get Prices - View current prices and portfolio value\n\n" +
+     "Crypto Commands:\n" +
+     "/add <amount> <ticker> - Add crypto to portfolio\n" +
+     "/remove <ticker> - Remove crypto from portfolio\n" +
+     "/list - List all your crypto holdings\n" +
+     "/prices - Get current prices\n\n" +
+     "Commodity Commands:\n" +
+     "/addcom <amount> <symbol> - Add commodity (e.g., XAU, XAG)\n" +
+     "/removecom <symbol> - Remove commodity\n" +
+     "/commodities - List commodity holdings\n" +
+     "/comprices - Get commodity prices"
+   );
    break;
   }
  }
