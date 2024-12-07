@@ -66,7 +66,7 @@ bot.onText(/\/help/, (msg) => {
 });
 
 // Handle button clicks
-bot.on("message", (msg) => {
+bot.on("message", async (msg) => {
  const chatId = msg.chat.id;
 
  switch (msg.text) {
