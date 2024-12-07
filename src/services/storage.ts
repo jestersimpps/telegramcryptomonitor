@@ -42,7 +42,8 @@ class StorageService {
           key,
           {
             ...userData,
-            tickers: Object.fromEntries(userData.tickers)
+            tickers: Object.fromEntries(userData.tickers),
+            commodities: Object.fromEntries(userData.commodities)
           }
         ])
       );

@@ -163,6 +163,38 @@ bot.onText(/\/comprices/, async (msg) => {
  await sendCommodityPriceUpdate(chatId, userData.commodities);
 });
 
+bot.onText(/\/addcom (.+)/, (msg, match) => {
+ if (!match) return;
+ const chatId = msg.chat.id;
+ const parts = match[1].trim().split(" ");
+ if (parts.length !== 2) {
+  bot.sendMessage(
+   chatId,
+   "Usage: /addcom <amount> <symbol>\nExample: /addcom 1 XAU"
+  );
+  return;
+ }
+ const [amountStr, symbol] = parts;
+ const amount = parseFloat(amountStr);
+ if (isNaN(amount) || amount <= 0) {
+  bot.sendMessage(chatId, "Please provide a valid positive number for amount");
+  return;
+ }
+ storageService.addCommodity(chatId, symbol, amount);
+ bot.sendMessage(
+  chatId,
+  `Added ${amount} ${symbol.toUpperCase()} to your monitoring list.`
+ );
+});
+
+bot.onText(/\/removecom (.+)/, (msg, match) => {
+ if (!match) return;
+ const chatId = msg.chat.id;
+ const symbol = match[1].trim();
+ storageService.removeCommodity(chatId, symbol);
+ bot.sendMessage(chatId, `Removed ${symbol.toUpperCase()} from your monitoring list.`);
+});
+
 // Function to send token list with prices
 async function sendTokenList(chatId: number, tickers: Map<string, number>) {
  const tickerIds = Array.from(tickers.keys());
