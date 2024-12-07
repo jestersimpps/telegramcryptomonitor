@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc",
+    "build": "rm -rf dist && tsc --project tsconfig.json --listFiles --diagnostics",
     "dev": "ts-node src/index.ts",
     "watch": "tsc -w"
   },
