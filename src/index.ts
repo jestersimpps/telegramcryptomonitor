@@ -44,12 +44,27 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   
   switch (msg.text) {
-    case '📊 Get Prices':
-      bot.onText(/\/prices/, msg);
+    case '📊 Get Prices': {
+      const userData = storageService.getUser(chatId);
+      if (!userData || userData.tickers.size === 0) {
+        bot.sendMessage(chatId, 'You have no tickers in your monitoring list.');
+        return;
+      }
+      sendPriceUpdate(chatId, userData.tickers);
       break;
-    case '📋 List Tokens':
-      bot.onText(/\/list/, msg);
+    }
+    case '📋 List Tokens': {
+      const userData = storageService.getUser(chatId);
+      if (!userData || userData.tickers.size === 0) {
+        bot.sendMessage(chatId, 'You have no tickers in your monitoring list.');
+        return;
+      }
+      const tickerList = Array.from(userData.tickers.entries())
+        .map(([ticker, amount]) => `${ticker.toUpperCase()}: ${amount}`)
+        .join('\n');
+      bot.sendMessage(chatId, `Your monitored tickers:\n${tickerList}`);
       break;
+    }
     case '➕ Add Token':
       bot.sendMessage(chatId, 'To add a token, use the command:\n/add <amount> <ticker>\nExample: /add 0.5 btc');
       break;
