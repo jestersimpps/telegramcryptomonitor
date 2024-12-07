@@ -29,7 +29,7 @@ const bot = new TelegramBot(token, { polling: true });
 // Keyboard setup
 const mainKeyboard = {
  reply_markup: {
-  keyboard: [[{ text: "📊 Get Prices" }, { text: "❓ Help" }]],
+  keyboard: [[{ text: "📊 Get Prices" }, { text: "📈 Pi Cycle" }, { text: "❓ Help" }]],
   resize_keyboard: true,
  },
 };
@@ -69,6 +69,10 @@ bot.on("message", (msg) => {
  const chatId = msg.chat.id;
 
  switch (msg.text) {
+  case "📈 Pi Cycle": {
+   bot.emit("message", { text: "/picycle", chat: { id: chatId } });
+   break;
+  }
   case "📊 Get Prices": {
    const userData = storageService.getUser(chatId);
    if (!userData || userData.tickers.size === 0) {
