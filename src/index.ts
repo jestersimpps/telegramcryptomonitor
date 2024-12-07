@@ -29,7 +29,11 @@ const bot = new TelegramBot(token, { polling: true });
 // Keyboard setup
 const mainKeyboard = {
  reply_markup: {
-  keyboard: [[{ text: "📊 Get Prices" }, { text: "📈 Pi Cycle" }, { text: "❓ Help" }]],
+  keyboard: [
+    [{ text: "📊 Get Prices" }],
+    [{ text: "📈 Pi Cycle" }],
+    [{ text: "❓ Help" }]
+  ],
   resize_keyboard: true,
  },
 };
