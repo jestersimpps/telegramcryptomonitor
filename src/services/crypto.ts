@@ -9,7 +9,7 @@ class CryptoService {
       const response = await axios.get(`${this.baseUrl}/simple/price`, {
         params: {
           ids: tickers.join(','),
-          vs_currency: 'usd',
+          vs_currencies: 'usd',
           include_24hr_change: true
         }
       });
