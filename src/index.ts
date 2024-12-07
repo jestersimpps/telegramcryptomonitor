@@ -45,7 +45,7 @@ bot.onText(/\/help/, (msg) => {
    "/add <amount> <ticker> - Add crypto to portfolio\n" +
    "/remove <ticker> - Remove crypto from portfolio\n" +
    "/list - List all your crypto holdings\n" +
-   "/prices - Get current prices\n\n" +
+   "/prices - Get current prices\n"
  );
 });
 
