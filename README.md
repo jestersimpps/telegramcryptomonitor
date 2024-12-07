@@ -11,6 +11,8 @@ A Telegram bot for monitoring cryptocurrency prices and technical indicators.
 - 🔄 Auto-refreshing price cache
 - ⚡ Rate limiting protection
 
+![Bot Interface](pics/screenshot.jpeg)
+
 ## Setup
 
 1. Clone the repository
