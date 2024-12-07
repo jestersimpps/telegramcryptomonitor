@@ -56,7 +56,7 @@ class StorageService {
   }
 
   public addTicker(chatId: number, ticker: string, amount: number): void {
-    const userData = this.users.get(chatId) || { chatId, tickers: new Map() };
+    const userData = this.users.get(chatId) || { chatId, tickers: new Map(), updateTime: undefined };
     userData.tickers.set(ticker.toLowerCase(), amount);
     this.users.set(chatId, userData);
     this.saveData();
